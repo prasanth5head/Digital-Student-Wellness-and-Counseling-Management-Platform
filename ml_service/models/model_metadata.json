@@ -1,0 +1,82 @@
+{
+  "modelName": "AuraWell-RiskClassifier",
+  "version": "1.0",
+  "algorithm": "Decision Tree",
+  "dataset": "Kaggle Student Mental Health & Academic Stress Dataset",
+  "trainedAt": "2026-08-19T12:13:15.758649",
+  "features": [
+    "Academic_Pressure",
+    "Study_Workload",
+    "Stress_Level",
+    "Sleep_Quality_Hours",
+    "Anxiety_Score",
+    "Depression_Indicator",
+    "Social_Connectedness",
+    "Physical_Activity_Hrs",
+    "Previous_Counseling",
+    "Wellness_Score"
+  ],
+  "metrics": {
+    "accuracy": 0.97,
+    "precision": 0.9702,
+    "recall": 0.97,
+    "f1_score": 0.97,
+    "high_risk_recall": 0.9893
+  },
+  "allModelComparisons": {
+    "Logistic Regression": {
+      "accuracy": 0.9067,
+      "precision": 0.9162,
+      "recall": 0.9067,
+      "f1_score": 0.9083,
+      "high_risk_recall": 0.9679
+    },
+    "Decision Tree": {
+      "accuracy": 0.97,
+      "precision": 0.9702,
+      "recall": 0.97,
+      "f1_score": 0.97,
+      "high_risk_recall": 0.9893
+    },
+    "Random Forest": {
+      "accuracy": 0.96,
+      "precision": 0.9632,
+      "recall": 0.96,
+      "f1_score": 0.9599,
+      "high_risk_recall": 1.0
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.9633,
+      "precision": 0.9644,
+      "recall": 0.9633,
+      "f1_score": 0.9633,
+      "high_risk_recall": 0.9929
+    },
+    "Support Vector Classifier (SVC)": {
+      "accuracy": 0.8967,
+      "precision": 0.8998,
+      "recall": 0.8967,
+      "f1_score": 0.8974,
+      "high_risk_recall": 0.9274
+    }
+  },
+  "featureImportances": {
+    "Wellness_Score": 0.6235,
+    "Stress_Level": 0.0978,
+    "Anxiety_Score": 0.0949,
+    "Sleep_Quality_Hours": 0.0538,
+    "Academic_Pressure": 0.0369,
+    "Depression_Indicator": 0.0336,
+    "Social_Connectedness": 0.02,
+    "Physical_Activity_Hrs": 0.0171,
+    "Study_Workload": 0.0134,
+    "Previous_Counseling": 0.009
+  },
+  "classes": [
+    "LOW",
+    "MODERATE",
+    "HIGH",
+    "CRITICAL"
+  ],
+  "status": "ACTIVE"
+}
