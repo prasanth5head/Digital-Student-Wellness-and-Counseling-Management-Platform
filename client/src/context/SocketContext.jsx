@@ -23,7 +23,8 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    const socketUrl = `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}/ws`;
+    const backendOrigin = import.meta.env.VITE_API_URL || '';
+    const socketUrl = backendOrigin ? `${backendOrigin}/ws` : `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}/ws`;
 
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
