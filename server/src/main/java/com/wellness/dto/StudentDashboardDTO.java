@@ -10,10 +10,10 @@ public class StudentDashboardDTO {
     private String registerNumber;
     private String departmentName;
     private int yearOfStudy;
-    private int currentWellnessScore;
-    private int stressScore;
-    private int anxietyScore;
-    private int sleepScore;
+    private Integer currentWellnessScore;
+    private Integer stressScore;
+    private Integer anxietyScore;
+    private Integer sleepScore;
     private RiskLevel riskLevel;
     private String wellnessStatus;
     private AssessmentResponse recentAssessment;
@@ -30,7 +30,7 @@ public class StudentDashboardDTO {
     public StudentDashboardDTO() {}
 
     public StudentDashboardDTO(String studentName, String registerNumber, String departmentName, int yearOfStudy,
-                               int currentWellnessScore, int stressScore, int anxietyScore, int sleepScore,
+                               Integer currentWellnessScore, Integer stressScore, Integer anxietyScore, Integer sleepScore,
                                RiskLevel riskLevel, String wellnessStatus, AssessmentResponse recentAssessment,
                                List<CategoryScore> latestCategoryScores, List<Map<String, Object>> scoreTrend,
                                Appointment nextAppointment, List<Appointment> upcomingAppointments,
@@ -68,10 +68,10 @@ public class StudentDashboardDTO {
         private String registerNumber;
         private String departmentName;
         private int yearOfStudy;
-        private int currentWellnessScore;
-        private int stressScore;
-        private int anxietyScore;
-        private int sleepScore;
+        private Integer currentWellnessScore;
+        private Integer stressScore;
+        private Integer anxietyScore;
+        private Integer sleepScore;
         private RiskLevel riskLevel;
         private String wellnessStatus;
         private AssessmentResponse recentAssessment;
@@ -89,10 +89,10 @@ public class StudentDashboardDTO {
         public Builder registerNumber(String registerNumber) { this.registerNumber = registerNumber; return this; }
         public Builder departmentName(String departmentName) { this.departmentName = departmentName; return this; }
         public Builder yearOfStudy(int yearOfStudy) { this.yearOfStudy = yearOfStudy; return this; }
-        public Builder currentWellnessScore(int currentWellnessScore) { this.currentWellnessScore = currentWellnessScore; return this; }
-        public Builder stressScore(int stressScore) { this.stressScore = stressScore; return this; }
-        public Builder anxietyScore(int anxietyScore) { this.anxietyScore = anxietyScore; return this; }
-        public Builder sleepScore(int sleepScore) { this.sleepScore = sleepScore; return this; }
+        public Builder currentWellnessScore(Integer currentWellnessScore) { this.currentWellnessScore = currentWellnessScore; return this; }
+        public Builder stressScore(Integer stressScore) { this.stressScore = stressScore; return this; }
+        public Builder anxietyScore(Integer anxietyScore) { this.anxietyScore = anxietyScore; return this; }
+        public Builder sleepScore(Integer sleepScore) { this.sleepScore = sleepScore; return this; }
         public Builder riskLevel(RiskLevel riskLevel) { this.riskLevel = riskLevel; return this; }
         public Builder wellnessStatus(String wellnessStatus) { this.wellnessStatus = wellnessStatus; return this; }
         public Builder recentAssessment(AssessmentResponse recentAssessment) { this.recentAssessment = recentAssessment; return this; }
@@ -107,10 +107,10 @@ public class StudentDashboardDTO {
         public Builder dailyTip(String dailyTip) { this.dailyTip = dailyTip; return this; }
 
         public StudentDashboardDTO build() {
-            return new StudentDashboardDTO(studentName, registerNumber, departmentName, yearOfStudy, currentWellnessScore,
-                    stressScore, anxietyScore, sleepScore, riskLevel, wellnessStatus, recentAssessment,
-                    latestCategoryScores, scoreTrend, nextAppointment, upcomingAppointments, pendingRequests,
-                    unreadNotificationCount, recentNotifications, recommendedResources, dailyTip);
+            return new StudentDashboardDTO(studentName, registerNumber, departmentName, yearOfStudy,
+                    currentWellnessScore, stressScore, anxietyScore, sleepScore, riskLevel, wellnessStatus,
+                    recentAssessment, latestCategoryScores, scoreTrend, nextAppointment, upcomingAppointments,
+                    pendingRequests, unreadNotificationCount, recentNotifications, recommendedResources, dailyTip);
         }
     }
 
@@ -122,14 +122,14 @@ public class StudentDashboardDTO {
     public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
     public int getYearOfStudy() { return yearOfStudy; }
     public void setYearOfStudy(int yearOfStudy) { this.yearOfStudy = yearOfStudy; }
-    public int getCurrentWellnessScore() { return currentWellnessScore; }
-    public void setCurrentWellnessScore(int currentWellnessScore) { this.currentWellnessScore = currentWellnessScore; }
-    public int getStressScore() { return stressScore; }
-    public void setStressScore(int stressScore) { this.stressScore = stressScore; }
-    public int getAnxietyScore() { return anxietyScore; }
-    public void setAnxietyScore(int anxietyScore) { this.anxietyScore = anxietyScore; }
-    public int getSleepScore() { return sleepScore; }
-    public void setSleepScore(int sleepScore) { this.sleepScore = sleepScore; }
+    public Integer getCurrentWellnessScore() { return currentWellnessScore; }
+    public void setCurrentWellnessScore(Integer currentWellnessScore) { this.currentWellnessScore = currentWellnessScore; }
+    public Integer getStressScore() { return stressScore; }
+    public void setStressScore(Integer stressScore) { this.stressScore = stressScore; }
+    public Integer getAnxietyScore() { return anxietyScore; }
+    public void setAnxietyScore(Integer anxietyScore) { this.anxietyScore = anxietyScore; }
+    public Integer getSleepScore() { return sleepScore; }
+    public void setSleepScore(Integer sleepScore) { this.sleepScore = sleepScore; }
     public RiskLevel getRiskLevel() { return riskLevel; }
     public void setRiskLevel(RiskLevel riskLevel) { this.riskLevel = riskLevel; }
     public String getWellnessStatus() { return wellnessStatus; }
