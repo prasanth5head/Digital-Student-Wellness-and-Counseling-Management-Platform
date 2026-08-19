@@ -36,7 +36,7 @@ import ResourceManagement from '../pages/admin/ResourceManagement';
 import Announcements from '../pages/admin/Announcements';
 import AuditLogs from '../pages/admin/AuditLogs';
 
-// Protected Route Wrapper with RBAC
+// Protected Route Wrapper with Strict RBAC Isolation
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, role, loading } = useAuth();
 
@@ -47,6 +47,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(role)) {
+    if (role === 'ROLE_STUDENT') return <Navigate to="/student/dashboard" replace />;
+    if (role === 'ROLE_COUNSELOR') return <Navigate to="/counselor/dashboard" replace />;
+    if (role === 'ROLE_ADMIN') return <Navigate to="/admin/dashboard" replace />;
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -73,11 +76,11 @@ export const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Student Portal Routes */}
+      {/* Student Portal Routes - STRICT: Only Students */}
       <Route
         path="/student"
         element={
-          <ProtectedRoute allowedRoles={['ROLE_STUDENT', 'ROLE_ADMIN']}>
+          <ProtectedRoute allowedRoles={['ROLE_STUDENT']}>
             <DashboardLayout />
           </ProtectedRoute>
         }
@@ -93,11 +96,11 @@ export const AppRoutes = () => {
         <Route path="profile" element={<StudentProfile />} />
       </Route>
 
-      {/* Counselor Portal Routes */}
+      {/* Counselor Portal Routes - STRICT: Only Counselors */}
       <Route
         path="/counselor"
         element={
-          <ProtectedRoute allowedRoles={['ROLE_COUNSELOR', 'ROLE_ADMIN']}>
+          <ProtectedRoute allowedRoles={['ROLE_COUNSELOR']}>
             <DashboardLayout />
           </ProtectedRoute>
         }
@@ -114,7 +117,7 @@ export const AppRoutes = () => {
         <Route path="profile" element={<StudentProfile />} />
       </Route>
 
-      {/* Admin Portal Routes */}
+      {/* Admin Portal Routes - STRICT: Only Administrators */}
       <Route
         path="/admin"
         element={
@@ -138,4 +141,5 @@ export const AppRoutes = () => {
     </Routes>
   );
 };
+
 export default AppRoutes;

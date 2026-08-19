@@ -9,23 +9,43 @@ import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
-import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import SpaIcon from '@mui/icons-material/Spa';
+import SchoolIcon from '@mui/icons-material/School';
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { GoogleLogin } from '@react-oauth/google';
-import { useAuth, DEMO_ACCOUNTS } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const Login = () => {
   const { login, googleLogin, loading } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('student.alex@wellness.edu');
-  const [password, setPassword] = useState('Student@123');
+  const [selectedRole, setSelectedRole] = useState('ROLE_STUDENT'); // 'ROLE_STUDENT', 'ROLE_COUNSELOR', 'ROLE_ADMIN'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const handleRoleChange = (_, newRole) => {
+    if (newRole) {
+      setSelectedRole(newRole);
+      setError('');
+    }
+  };
+
   const handleAuthSuccess = (res) => {
+    // Strict Role Validation
+    if (res.user.role !== selectedRole) {
+      const actualRoleName = res.user.role === 'ROLE_STUDENT' ? 'Student' : res.user.role === 'ROLE_COUNSELOR' ? 'Counselor' : 'Admin';
+      const attemptedRoleName = selectedRole === 'ROLE_STUDENT' ? 'Student' : selectedRole === 'ROLE_COUNSELOR' ? 'Counselor' : 'Admin';
+      setError(`Access Restricted: This account is registered as a ${actualRoleName}. You cannot access the ${attemptedRoleName} portal. Please select the "${actualRoleName}" tab above.`);
+      return;
+    }
+
     if (res.user.role === 'ROLE_STUDENT') navigate('/student/dashboard');
     else if (res.user.role === 'ROLE_COUNSELOR') navigate('/counselor/dashboard');
     else if (res.user.role === 'ROLE_ADMIN') navigate('/admin/dashboard');
@@ -61,11 +81,33 @@ export const Login = () => {
     setError('Google Sign-In was cancelled or encountered an error.');
   };
 
-  const fillCredentials = (acc) => {
-    setEmail(acc.email);
-    setPassword(acc.password);
-    setError('');
+  const getRoleTheme = () => {
+    switch (selectedRole) {
+      case 'ROLE_COUNSELOR':
+        return {
+          title: 'Counselor Portal',
+          subtitle: 'Clinical counseling management & appointment hub',
+          color: '#6366F1',
+          gradient: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+        };
+      case 'ROLE_ADMIN':
+        return {
+          title: 'Administrator Portal',
+          subtitle: 'Institutional wellness oversight & analytics',
+          color: '#8B5CF6',
+          gradient: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+        };
+      default:
+        return {
+          title: 'Student Wellness Portal',
+          subtitle: 'Confidential mental health assessments & counseling',
+          color: '#0284C7',
+          gradient: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+        };
+    }
   };
+
+  const currentTheme = getRoleTheme();
 
   return (
     <Box
@@ -80,7 +122,7 @@ export const Login = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Background Decorative Gradient Blobs */}
+      {/* Decorative Gradient Blobs */}
       <Box
         sx={{
           position: 'absolute',
@@ -89,9 +131,10 @@ export const Login = () => {
           width: '45vw',
           height: '45vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(2, 132, 199, 0.18) 0%, rgba(2, 132, 199, 0) 70%)',
-          filter: 'blur(40px)',
+          background: `radial-gradient(circle, ${currentTheme.color}25 0%, transparent 70%)`,
+          filter: 'blur(50px)',
           zIndex: 0,
+          transition: 'all 0.5s ease',
         }}
       />
       <Box
@@ -99,56 +142,126 @@ export const Login = () => {
           position: 'absolute',
           bottom: '-15%',
           right: '-10%',
-          width: '50vw',
-          height: '50vw',
+          width: '45vw',
+          height: '45vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0) 70%)',
-          filter: 'blur(40px)',
+          background: `radial-gradient(circle, ${currentTheme.color}20 0%, transparent 70%)`,
+          filter: 'blur(50px)',
           zIndex: 0,
+          transition: 'all 0.5s ease',
         }}
       />
 
       <Card
         sx={{
-          maxWidth: 480,
+          maxWidth: 500,
           width: '100%',
           borderRadius: 4,
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
-          position: 'relative',
-          zIndex: 1,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.12)',
+          border: '1px solid',
+          borderColor: 'divider',
           backdropFilter: 'blur(16px)',
-          bgcolor: 'background.paper',
-          border: (theme) => `1px solid ${theme.palette.divider}`,
+          bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.9)' : 'rgba(255, 255, 255, 0.98)'),
+          zIndex: 1,
         }}
       >
         <CardContent sx={{ p: { xs: 3, sm: 4.5 } }}>
-          {/* Header */}
+          {/* Header Brand */}
           <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Box
+            <Avatar
               sx={{
-                width: 52,
-                height: 52,
-                borderRadius: 3.5,
-                background: 'linear-gradient(135deg, #0284C7 0%, #6366F1 100%)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
+                bgcolor: currentTheme.color,
+                width: 54,
+                height: 54,
+                mx: 'auto',
                 mb: 1.5,
-                boxShadow: '0 8px 20px rgba(2, 132, 199, 0.35)',
+                boxShadow: `0 8px 20px -4px ${currentTheme.color}60`,
+                transition: 'all 0.3s ease',
               }}
             >
-              <SpaIcon sx={{ fontSize: 32 }} />
-            </Box>
-            <Typography variant="h4" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif' }}>
-              Welcome to AuraWell
+              <SpaIcon sx={{ fontSize: 30 }} />
+            </Avatar>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.02em' }}>
+              {currentTheme.title}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-              Digital Student Wellness & Counseling Management Platform
+              {currentTheme.subtitle}
             </Typography>
           </Box>
 
-          {/* Google Sign-In Button */}
+          {/* Role Selector Tabs */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1, textAlign: 'center' }}>
+              Select Your Role to Sign In
+            </Typography>
+            <Tabs
+              value={selectedRole}
+              onChange={handleRoleChange}
+              variant="fullWidth"
+              sx={{
+                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'),
+                borderRadius: 3,
+                p: 0.5,
+                '& .MuiTabs-indicator': {
+                  borderRadius: 2.5,
+                  height: '100%',
+                  bgcolor: currentTheme.color,
+                  zIndex: 0,
+                },
+              }}
+            >
+              <Tab
+                value="ROLE_STUDENT"
+                icon={<SchoolIcon fontSize="small" />}
+                iconPosition="start"
+                label="Student"
+                sx={{
+                  zIndex: 1,
+                  borderRadius: 2.5,
+                  minHeight: 44,
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  textTransform: 'none',
+                  color: selectedRole === 'ROLE_STUDENT' ? '#FFFFFF !important' : 'text.secondary',
+                  transition: 'color 0.2s ease',
+                }}
+              />
+              <Tab
+                value="ROLE_COUNSELOR"
+                icon={<PsychologyIcon fontSize="small" />}
+                iconPosition="start"
+                label="Counselor"
+                sx={{
+                  zIndex: 1,
+                  borderRadius: 2.5,
+                  minHeight: 44,
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  textTransform: 'none',
+                  color: selectedRole === 'ROLE_COUNSELOR' ? '#FFFFFF !important' : 'text.secondary',
+                  transition: 'color 0.2s ease',
+                }}
+              />
+              <Tab
+                value="ROLE_ADMIN"
+                icon={<AdminPanelSettingsIcon fontSize="small" />}
+                iconPosition="start"
+                label="Admin"
+                sx={{
+                  zIndex: 1,
+                  borderRadius: 2.5,
+                  minHeight: 44,
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  textTransform: 'none',
+                  color: selectedRole === 'ROLE_ADMIN' ? '#FFFFFF !important' : 'text.secondary',
+                  transition: 'color 0.2s ease',
+                }}
+              />
+            </Tabs>
+          </Box>
+
+          {/* Google Sign-In (Available for Student & Counselor) */}
           <Box sx={{ mb: 2.5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
               <GoogleLogin
@@ -164,59 +277,24 @@ export const Login = () => {
             </Box>
             <Divider sx={{ width: '100%', my: 2.5 }}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, px: 1 }}>
-                OR SIGN IN WITH EMAIL
+                OR SIGN IN WITH EMAIL & PASSWORD
               </Typography>
             </Divider>
           </Box>
 
-          {/* Quick 1-Click Demo Login Selector */}
-          <Box sx={{ mb: 2.5 }}>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
-              Quick Demo Personas (1-Click Fill)
-            </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
-              {DEMO_ACCOUNTS.map((acc) => {
-                const isSelected = email === acc.email;
-                return (
-                  <Button
-                    key={acc.email}
-                    variant={isSelected ? 'contained' : 'outlined'}
-                    size="small"
-                    onClick={() => fillCredentials(acc)}
-                    sx={{
-                      py: 1,
-                      px: 0.5,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 0.5,
-                      borderRadius: 2.5,
-                      borderColor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'),
-                      bgcolor: isSelected ? 'primary.main' : 'background.subtle',
-                      color: isSelected ? '#FFFFFF' : 'text.primary',
-                    }}
-                  >
-                    <Avatar src={acc.avatar} sx={{ width: 26, height: 26 }} />
-                    <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.7rem' }}>
-                      {acc.roleName}
-                    </Typography>
-                  </Button>
-                );
-              })}
-            </Box>
-          </Box>
-
           {error && (
-            <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2.5 }}>
+            <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2.5, fontWeight: 600 }}>
               {error}
             </Alert>
           )}
 
-          {/* Form */}
+          {/* Login Form */}
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
               fullWidth
               label="Email Address"
               type="email"
+              placeholder={selectedRole === 'ROLE_STUDENT' ? 'student@university.edu' : selectedRole === 'ROLE_COUNSELOR' ? 'counselor@wellness.edu' : 'admin@wellness.edu'}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -231,6 +309,7 @@ export const Login = () => {
               fullWidth
               label="Password"
               type="password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -245,7 +324,6 @@ export const Login = () => {
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
               size="large"
               disabled={loading}
               endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <ArrowForwardIcon />}
@@ -256,17 +334,19 @@ export const Login = () => {
                 borderRadius: 2.5,
                 fontWeight: 700,
                 fontSize: '1rem',
-                background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+                background: currentTheme.gradient,
+                boxShadow: `0 8px 20px -4px ${currentTheme.color}50`,
+                textTransform: 'none',
               }}
             >
-              {loading ? 'Authenticating...' : 'Sign In to Portal'}
+              {loading ? 'Authenticating...' : `Sign In as ${selectedRole === 'ROLE_STUDENT' ? 'Student' : selectedRole === 'ROLE_COUNSELOR' ? 'Counselor' : 'Admin'}`}
             </Button>
           </Box>
 
           <Box sx={{ textAlign: 'center', mt: 2 }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Don't have an account?{' '}
-              <Link to="/register" style={{ color: '#0284C7', fontWeight: 700, textDecoration: 'none' }}>
+              Don't have an account yet?{' '}
+              <Link to="/register" style={{ color: currentTheme.color, fontWeight: 700, textDecoration: 'none' }}>
                 Register here
               </Link>
             </Typography>
@@ -276,4 +356,5 @@ export const Login = () => {
     </Box>
   );
 };
+
 export default Login;

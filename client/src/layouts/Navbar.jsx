@@ -15,7 +15,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import { useAuth } from '../context/AuthContext';
 import { useThemeMode } from '../context/ThemeContext';
-import RoleSwitcher from './RoleSwitcher';
 import NotificationMenu from './NotificationMenu';
 import { useNavigate } from 'react-router-dom';
 
@@ -39,6 +38,13 @@ export const Navbar = ({ handleDrawerToggle }) => {
     handleProfileMenuClose();
     if (isStudent) navigate('/student/profile');
     else if (isCounselor) navigate('/counselor/profile');
+    else navigate('/admin/profile');
+  };
+
+  const handleLogout = () => {
+    handleProfileMenuClose();
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -48,15 +54,16 @@ export const Navbar = ({ handleDrawerToggle }) => {
       sx={{
         width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
         ml: { sm: `${DRAWER_WIDTH}px` },
-        backdropFilter: 'blur(12px)',
-        bgcolor: 'background.glass',
-        borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        bgcolor: 'background.paper',
         color: 'text.primary',
+        borderBottom: 1,
+        borderColor: 'divider',
+        backdropFilter: 'blur(10px)',
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 3 } }}>
-        {/* Left Side */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Left Side: Mobile toggle & Welcome text */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -75,9 +82,6 @@ export const Navbar = ({ handleDrawerToggle }) => {
 
         {/* Right Side Tools */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
-          {/* 1-Click Demo Persona Switcher */}
-          <RoleSwitcher />
-
           {/* Dark / Light Toggle */}
           <Tooltip title={mode === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
             <IconButton
@@ -108,33 +112,52 @@ export const Navbar = ({ handleDrawerToggle }) => {
             onClose={handleProfileMenuClose}
             PaperProps={{
               sx: {
-                borderRadius: 3,
                 minWidth: 200,
-                boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                borderRadius: 3,
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                mt: 1.5,
               },
             }}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-            <Box sx={{ px: 2, py: 1.5, borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
+            <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                 {user?.name}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
                 {user?.email}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'inline-block',
+                  mt: 0.5,
+                  px: 1,
+                  py: 0.2,
+                  borderRadius: 1,
+                  bgcolor: 'primary.main',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  fontSize: '0.65rem',
+                }}
+              >
+                {user?.role?.replace('ROLE_', '')}
               </Typography>
             </Box>
 
-            {(isStudent || isCounselor) && (
-              <MenuItem onClick={handleGoProfile} sx={{ py: 1.2 }}>
-                <PersonIcon sx={{ mr: 1.5, fontSize: 20, color: 'text.secondary' }} />
-                Profile Settings
-              </MenuItem>
-            )}
+            <MenuItem onClick={handleGoProfile} sx={{ py: 1.2 }}>
+              <PersonIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                My Profile
+              </Typography>
+            </MenuItem>
 
-            <MenuItem onClick={logout} sx={{ py: 1.2, color: 'error.main' }}>
-              <LogoutIcon sx={{ mr: 1.5, fontSize: 20 }} />
-              Logout
+            <MenuItem onClick={handleLogout} sx={{ py: 1.2, color: 'error.main' }}>
+              <LogoutIcon fontSize="small" sx={{ mr: 1.5 }} />
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                Sign Out
+              </Typography>
             </MenuItem>
           </Menu>
         </Box>
@@ -142,4 +165,5 @@ export const Navbar = ({ handleDrawerToggle }) => {
     </AppBar>
   );
 };
+
 export default Navbar;
