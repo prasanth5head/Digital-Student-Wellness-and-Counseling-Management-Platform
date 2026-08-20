@@ -7,6 +7,7 @@ import DashboardLayout from '../layouts/DashboardLayout';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import Unauthorized from '../pages/auth/Unauthorized';
+import Home from '../pages/public/Home';
 
 // Student Pages
 import StudentDashboard from '../pages/student/StudentDashboard';
@@ -60,7 +61,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 const RootRedirect = () => {
   const { isAuthenticated, role } = useAuth();
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) return <Home />;
   if (role === 'ROLE_STUDENT') return <Navigate to="/student/dashboard" replace />;
   if (role === 'ROLE_COUNSELOR') return <Navigate to="/counselor/dashboard" replace />;
   if (role === 'ROLE_ADMIN') return <Navigate to="/admin/dashboard" replace />;

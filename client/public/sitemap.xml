@@ -1,50 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <!-- Home / Root URL -->
+    <!-- Public home page -->
     <url>
         <loc>https://digital-student-wellness-and-counseling-y104.onrender.com/</loc>
-        <lastmod>2025-08-20</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
-
-    <!-- Public Authentication Pages -->
-    <url>
-        <loc>https://digital-student-wellness-and-counseling-y104.onrender.com/login</loc>
-        <lastmod>2025-08-20</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <url>
-        <loc>https://digital-student-wellness-and-counseling-y104.onrender.com/register</loc>
-        <lastmod>2025-08-20</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <!-- 
-    FUTURE PUBLIC PAGES
-    Add additional public, indexable URLs below as they are created:
-    
-    Example structure:
-    <url>
-        <loc>https://digital-student-wellness-and-counseling-y104.onrender.com/about</loc>
-        <lastmod>2025-08-20</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    Potential future pages:
-    - /about
-    - /wellness-resources
-    - /stress-management
-    - /exam-anxiety
-    - /sleep-wellness
-    - /counseling
-    - /faq
-    - /contact
-    -->
 
     <!-- 
     PROTECTED/PRIVATE PAGES - DO NOT INCLUDE IN SITEMAP

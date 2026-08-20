@@ -59,6 +59,10 @@ const SEO = ({
     }
 
     if (robots) {
+      const robotsTags = document.querySelectorAll('meta[name="robots"]');
+      robotsTags.forEach((tag, index) => {
+        if (index > 0) tag.remove();
+      });
       updateMetaTag('robots', 'name', robots);
     }
 

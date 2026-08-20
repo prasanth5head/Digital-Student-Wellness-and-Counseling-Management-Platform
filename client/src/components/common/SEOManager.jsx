@@ -39,7 +39,11 @@ const SEOManager = ({ children }) => {
 
     // Update robots
     if (seoConfig.robots) {
-      let robotsTag = document.querySelector('meta[name="robots"]');
+      const robotsTags = document.querySelectorAll('meta[name="robots"]');
+      let robotsTag = robotsTags[0];
+      robotsTags.forEach((tag, index) => {
+        if (index > 0) tag.remove();
+      });
       if (!robotsTag) {
         robotsTag = document.createElement('meta');
         robotsTag.setAttribute('name', 'robots');

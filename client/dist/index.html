@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
+    <!-- Google Analytics GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQMFHF6T55"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WQMFHF6T55');
+    </script>
+
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0d9488" />
@@ -26,6 +35,20 @@
     <meta name="author" content="AuraWell Platform" />
     <meta name="robots" content="index, follow" />
 
+    <!-- Google Search Console Verification -->
+    <!-- 
+      Set VITE_GOOGLE_SEARCH_CONSOLE_VERIFICATION in .env to enable
+      Example: VITE_GOOGLE_SEARCH_CONSOLE_VERIFICATION=abc123xyz
+    -->
+    <script>
+      // Add Search Console verification tag if provided via environment variable
+      // This script runs after Vite module loads, so we check window globals
+      document.addEventListener('DOMContentLoaded', function() {
+        // Verification code would be injected by React app if needed
+        // See client/src/App.jsx for React-based verification
+      });
+    </script>
+
     <!-- Open Graph -->
     <meta property="og:title" content="AuraWell - Digital Student Wellness Platform" />
     <meta property="og:description" content="Confidential mental health assessments and counseling support for students." />
@@ -36,7 +59,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/assets/index-CeEpiWFE.js"></script>
+    <script type="module" crossorigin src="/assets/index-BSUwZrQk.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-B614KWx2.css">
   <link rel="manifest" href="/manifest.webmanifest"></head>
   <body>

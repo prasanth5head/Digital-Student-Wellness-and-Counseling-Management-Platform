@@ -176,7 +176,8 @@ export const routeSEOConfig = {
  * Returns sensible defaults if route not found
  */
 export const getSEOConfig = (pathname) => {
-  const config = routeSEOConfig[pathname];
+  const normalizedPath = (pathname || '/').split('?')[0].replace(/\/+$/, '') || '/';
+  const config = routeSEOConfig[normalizedPath];
 
   if (config) {
     return config;
