@@ -1,0 +1,38 @@
+# AuraWell - Digital Student Wellness & Counseling Platform
+# Robots.txt - Search Engine Crawling Rules
+# Production URL: https://digital-student-wellness-and-counseling-y104.onrender.com
+
+# Allow all search engines by default
+User-agent: *
+Allow: /
+
+# Disallow authentication pages (also protected by meta robots="noindex")
+Disallow: /login
+Disallow: /register
+Disallow: /unauthorized
+
+# Disallow protected portals
+# Student Portal - Private, requires authentication
+Disallow: /student/
+
+# Counselor Portal - Private, requires authentication
+Disallow: /counselor/
+
+# Admin Portal - Private, requires authentication
+Disallow: /admin/
+
+# Point to sitemap for search engines
+Sitemap: https://digital-student-wellness-and-counseling-y104.onrender.com/sitemap.xml
+
+# Crawl delay (optional - helps with server load)
+# Crawl-delay: 1
+
+# Request rate (optional - helps manage bot traffic)
+# Request-rate: 1/10
+
+# Additional crawler rules (optional for specific bots)
+# User-agent: Googlebot
+# Allow: /
+
+# User-agent: Bingbot
+# Allow: /

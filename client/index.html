@@ -35,6 +35,20 @@
     <meta name="author" content="AuraWell Platform" />
     <meta name="robots" content="index, follow" />
 
+    <!-- Google Search Console Verification -->
+    <!-- 
+      Set VITE_GOOGLE_SEARCH_CONSOLE_VERIFICATION in .env to enable
+      Example: VITE_GOOGLE_SEARCH_CONSOLE_VERIFICATION=abc123xyz
+    -->
+    <script>
+      // Add Search Console verification tag if provided via environment variable
+      // This script runs after Vite module loads, so we check window globals
+      document.addEventListener('DOMContentLoaded', function() {
+        // Verification code would be injected by React app if needed
+        // See client/src/App.jsx for React-based verification
+      });
+    </script>
+
     <!-- Open Graph -->
     <meta property="og:title" content="AuraWell - Digital Student Wellness Platform" />
     <meta property="og:description" content="Confidential mental health assessments and counseling support for students." />
