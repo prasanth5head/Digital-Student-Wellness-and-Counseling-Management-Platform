@@ -10,13 +10,13 @@ const Home = () => {
     <Box component="main" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
       <Container maxWidth="md">
         <Typography component="h1" variant="h2" gutterBottom>
-          AuraWell
+          Digital Student Wellness
         </Typography>
         <Typography variant="h5" color="text.secondary" paragraph>
-          Digital Student Wellness & Counseling Platform
+          A counseling platform for student wellbeing
         </Typography>
         <Typography color="text.secondary" paragraph>
-          Access wellness assessments, counseling support, appointments, and personalized wellbeing guidance.
+          Digital Student Wellness connects students with wellness assessments, counseling support, appointments, wellness resources, and personalized wellbeing guidance.
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Button component={Link} to="/login" variant="contained">

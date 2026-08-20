@@ -33,7 +33,7 @@ const SEOManager = ({ children }) => {
       // Use default description if not specified
       let descTag = document.querySelector('meta[name="description"]');
       if (descTag) {
-        descTag.setAttribute('content', 'AuraWell - Digital Student Wellness & Counseling Management Platform');
+        descTag.setAttribute('content', 'Digital Student Wellness is a digital platform for student wellness assessments, counseling support, appointments, wellness resources and personalized wellbeing guidance.');
       }
     }
 
@@ -96,6 +96,36 @@ const SEOManager = ({ children }) => {
         document.head.appendChild(ogUrlTag);
       }
       ogUrlTag.setAttribute('content', ogUrlFull);
+    }
+
+    if (seoConfig.ogType) {
+      let ogTypeTag = document.querySelector('meta[property="og:type"]');
+      if (!ogTypeTag) {
+        ogTypeTag = document.createElement('meta');
+        ogTypeTag.setAttribute('property', 'og:type');
+        document.head.appendChild(ogTypeTag);
+      }
+      ogTypeTag.setAttribute('content', seoConfig.ogType);
+    }
+
+    if (seoConfig.ogImage) {
+      let ogImageTag = document.querySelector('meta[property="og:image"]');
+      if (!ogImageTag) {
+        ogImageTag = document.createElement('meta');
+        ogImageTag.setAttribute('property', 'og:image');
+        document.head.appendChild(ogImageTag);
+      }
+      ogImageTag.setAttribute('content', seoConfig.ogImage.startsWith('http') ? seoConfig.ogImage : `${siteUrl}${seoConfig.ogImage}`);
+    }
+
+    if (seoConfig.twitterCard) {
+      let twitterCardTag = document.querySelector('meta[name="twitter:card"]');
+      if (!twitterCardTag) {
+        twitterCardTag = document.createElement('meta');
+        twitterCardTag.setAttribute('name', 'twitter:card');
+        document.head.appendChild(twitterCardTag);
+      }
+      twitterCardTag.setAttribute('content', seoConfig.twitterCard);
     }
 
     // Track page view for GA4

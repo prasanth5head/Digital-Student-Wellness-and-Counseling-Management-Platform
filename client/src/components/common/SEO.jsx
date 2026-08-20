@@ -97,7 +97,8 @@ const SEO = ({
     }
 
     if (ogImage) {
-      updateMetaTag('og:image', 'property', ogImage);
+      const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
+      updateMetaTag('og:image', 'property', ogImageUrl);
     }
 
     // Update Twitter Card tags

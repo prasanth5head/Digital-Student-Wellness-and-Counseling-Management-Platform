@@ -12,14 +12,16 @@ export const routeSEOConfig = {
   // ==========================================
 
   '/': {
-    title: 'AuraWell | Digital Student Wellness & Counseling Platform',
-    description: 'AuraWell provides students with digital wellness assessments, counseling support, wellness resources, appointments and personalized wellbeing guidance.',
+    title: 'Digital Student Wellness | Counseling Platform',
+    description: 'Digital Student Wellness is a digital platform that provides students with wellness assessments, counseling support, appointments, wellness resources and personalized wellbeing guidance.',
     canonical: '/',
     robots: 'index, follow',
-    ogTitle: 'AuraWell - Student Wellness Platform',
-    ogDescription: 'Confidential mental health assessments and counseling support for students.',
+    ogTitle: 'Digital Student Wellness | Counseling Platform',
+    ogDescription: 'Digital wellness assessments, counseling support, appointments and wellness resources for students.',
     ogUrl: '/',
     ogType: 'website',
+    ogImage: '/icon-512.png',
+    twitterCard: 'summary_large_image',
   },
 
   '/login': {
@@ -185,7 +187,7 @@ export const getSEOConfig = (pathname) => {
 
   // Default SEO for unknown routes
   return {
-    title: 'AuraWell - Digital Student Wellness Platform',
+    title: 'Digital Student Wellness | Counseling Platform',
     robots: 'noindex, nofollow',
   };
 };
