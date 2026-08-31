@@ -14,6 +14,8 @@ const SEOManager = ({ children }) => {
   useEffect(() => {
     // Get SEO config for current route
     const seoConfig = getSEOConfig(location.pathname);
+    // Define siteUrl once here so it is always in scope for all meta tag updates
+    const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://digital-student-wellness-and-counseling-y104.onrender.com';
 
     // Update title
     if (seoConfig.title) {
@@ -54,7 +56,6 @@ const SEOManager = ({ children }) => {
 
     // Update canonical URL
     if (seoConfig.canonical) {
-      const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://digital-student-wellness-and-counseling-y104.onrender.com';
       const canonicalUrl = `${siteUrl}${seoConfig.canonical}`;
       let canonicalTag = document.querySelector('link[rel="canonical"]');
       if (!canonicalTag) {
@@ -87,7 +88,6 @@ const SEOManager = ({ children }) => {
     }
 
     if (seoConfig.ogUrl) {
-      const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://digital-student-wellness-and-counseling-y104.onrender.com';
       const ogUrlFull = `${siteUrl}${seoConfig.ogUrl}`;
       let ogUrlTag = document.querySelector('meta[property="og:url"]');
       if (!ogUrlTag) {

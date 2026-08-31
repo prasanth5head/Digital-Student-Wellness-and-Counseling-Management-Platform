@@ -9,6 +9,9 @@ export const useSEO = (seoConfig) => {
   const location = useLocation();
 
   useEffect(() => {
+    // Define siteUrl once here so it is always in scope
+    const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://digital-student-wellness-and-counseling-y104.onrender.com';
+
     // Update title
     if (seoConfig.title) {
       document.title = seoConfig.title;
@@ -42,7 +45,6 @@ export const useSEO = (seoConfig) => {
 
     // Update canonical
     if (seoConfig.canonical) {
-      const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://digital-student-wellness-and-counseling-y104.onrender.com';
       const canonicalUrl = `${siteUrl}${seoConfig.canonical}`;
       let canonicalTag = document.querySelector('link[rel="canonical"]');
       if (!canonicalTag) {
@@ -75,7 +77,6 @@ export const useSEO = (seoConfig) => {
     }
 
     if (seoConfig.ogUrl) {
-      const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://digital-student-wellness-and-counseling-y104.onrender.com';
       const ogUrlFull = `${siteUrl}${seoConfig.ogUrl}`;
       let ogUrlTag = document.querySelector('meta[property="og:url"]');
       if (!ogUrlTag) {
