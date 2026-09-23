@@ -28,7 +28,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 
 // Admin Icons
-import AnalyticsIcon from '@mui/icons-material/Analytics';
+import InsightsIcon from '@mui/icons-material/Insights';
 import DomainIcon from '@mui/icons-material/Domain';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -71,7 +71,7 @@ export const Sidebar = ({ mobileOpen, handleDrawerToggle }) => {
     }
     if (isAdmin) {
       return [
-        { label: 'Campus Analytics', path: '/admin/dashboard', icon: AnalyticsIcon },
+        { label: 'Campus Analytics', path: '/admin/dashboard', icon: InsightsIcon },
         { label: 'Department Health', path: '/admin/departments', icon: DomainIcon, highlight: true },
         { label: 'User Directory', path: '/admin/users', icon: ManageAccountsIcon },
         { label: 'Question Bank', path: '/admin/questions', icon: HelpOutlineIcon },

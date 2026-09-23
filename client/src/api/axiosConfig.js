@@ -3,6 +3,7 @@ import axios from 'axios';
 const backendOrigin = import.meta.env.VITE_API_URL || '';
 const api = axios.create({
   baseURL: backendOrigin ? `${backendOrigin}/api` : '/api',
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,6 +23,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    if (error.code === 'ECONNABORTED' || error.message?.toLowerCase().includes('timeout')) {
+      return Promise.reject(new Error('Server timed out. Please check that the backend server is running on port 8080.'));
+    }
+    if (error.message === 'Network Error') {
+      return Promise.reject(new Error('Network error: Unable to reach the backend server at http://localhost:8080.'));
+    }
     if (error.response?.status === 401) {
       // If unauthorized, clear token and redirect unless on login/register
       if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {

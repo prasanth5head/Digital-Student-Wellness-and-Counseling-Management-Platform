@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getSEOConfig } from '../../config/routeSEO';
-import { trackPageView } from '../../utils/analytics';
 
 /**
  * SEO Manager - Handles route-based SEO metadata updates

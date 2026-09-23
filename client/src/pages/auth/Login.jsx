@@ -19,8 +19,10 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import FlashOnIcon from '@mui/icons-material/FlashOn';
+import Chip from '@mui/material/Chip';
 import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, DEMO_ACCOUNTS } from '../../context/AuthContext';
 
 export const Login = () => {
   const { login, googleLogin, loading } = useAuth();
@@ -290,6 +292,64 @@ export const Login = () => {
 
           {/* Login Form */}
           <Box component="form" onSubmit={handleSubmit}>
+            {(() => {
+              const currentDemo = DEMO_ACCOUNTS.find((d) => d.role === selectedRole);
+              if (!currentDemo) return null;
+              return (
+                <Box
+                  sx={{
+                    mb: 2,
+                    p: 1.5,
+                    borderRadius: 2.5,
+                    bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'),
+                    border: '1px dashed',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                    <Avatar src={currentDemo.avatar} sx={{ width: 32, height: 32 }} />
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.2 }}>
+                        {currentDemo.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                        {currentDemo.email}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<FlashOnIcon sx={{ fontSize: 16 }} />}
+                    onClick={() => {
+                      setEmail(currentDemo.email);
+                      setPassword(currentDemo.password);
+                      setError('');
+                    }}
+                    sx={{
+                      textTransform: 'none',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      py: 0.5,
+                      px: 1.2,
+                      borderRadius: 2,
+                      borderColor: currentTheme.color,
+                      color: currentTheme.color,
+                      '&:hover': {
+                        bgcolor: `${currentTheme.color}15`,
+                        borderColor: currentTheme.color,
+                      },
+                    }}
+                  >
+                    Quick Fill
+                  </Button>
+                </Box>
+              );
+            })()}
+
             <TextField
               fullWidth
               label="Email Address"
