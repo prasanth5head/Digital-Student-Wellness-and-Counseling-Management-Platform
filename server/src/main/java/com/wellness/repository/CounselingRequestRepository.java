@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface CounselingRequestRepository extends MongoRepository<CounselingRequest, String> {
     List<CounselingRequest> findByStudentIdOrderByCreatedAtDesc(String studentId);
+    boolean existsByStudentId(String studentId);
     List<CounselingRequest> findByPreferredCounselorIdOrderByCreatedAtDesc(String counselorId);
     List<CounselingRequest> findByStatusOrderByCreatedAtDesc(RequestStatus status);
     List<CounselingRequest> findByUrgencyOrderByCreatedAtDesc(UrgencyLevel urgency);

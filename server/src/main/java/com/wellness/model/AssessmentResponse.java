@@ -27,6 +27,7 @@ public class AssessmentResponse {
     private RiskLevel riskLevel;
     private String summary;
     private List<String> recommendations = new ArrayList<>();
+    private MLPrediction mlPrediction;
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public AssessmentResponse() {}
@@ -34,7 +35,7 @@ public class AssessmentResponse {
     public AssessmentResponse(String id, String studentId, String studentName, String studentRegisterNo,
                               String departmentName, Map<String, Object> answers, List<CategoryScore> categoryScores,
                               int overallScore, RiskLevel riskLevel, String summary,
-                              List<String> recommendations, LocalDateTime createdAt) {
+                              List<String> recommendations, MLPrediction mlPrediction, LocalDateTime createdAt) {
         this.id = id;
         this.studentId = studentId;
         this.studentName = studentName;
@@ -46,6 +47,7 @@ public class AssessmentResponse {
         this.riskLevel = riskLevel;
         this.summary = summary;
         this.recommendations = recommendations != null ? recommendations : new ArrayList<>();
+        this.mlPrediction = mlPrediction;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
     }
 
@@ -65,6 +67,7 @@ public class AssessmentResponse {
         private RiskLevel riskLevel;
         private String summary;
         private List<String> recommendations = new ArrayList<>();
+        private MLPrediction mlPrediction;
         private LocalDateTime createdAt = LocalDateTime.now();
 
         public Builder id(String id) { this.id = id; return this; }
@@ -78,11 +81,12 @@ public class AssessmentResponse {
         public Builder riskLevel(RiskLevel riskLevel) { this.riskLevel = riskLevel; return this; }
         public Builder summary(String summary) { this.summary = summary; return this; }
         public Builder recommendations(List<String> recommendations) { this.recommendations = recommendations; return this; }
+        public Builder mlPrediction(MLPrediction mlPrediction) { this.mlPrediction = mlPrediction; return this; }
         public Builder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
 
         public AssessmentResponse build() {
             return new AssessmentResponse(id, studentId, studentName, studentRegisterNo, departmentName, answers,
-                    categoryScores, overallScore, riskLevel, summary, recommendations, createdAt);
+                    categoryScores, overallScore, riskLevel, summary, recommendations, mlPrediction, createdAt);
         }
     }
 
@@ -108,6 +112,8 @@ public class AssessmentResponse {
     public void setSummary(String summary) { this.summary = summary; }
     public List<String> getRecommendations() { return recommendations; }
     public void setRecommendations(List<String> recommendations) { this.recommendations = recommendations; }
+    public MLPrediction getMlPrediction() { return mlPrediction; }
+    public void setMlPrediction(MLPrediction mlPrediction) { this.mlPrediction = mlPrediction; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

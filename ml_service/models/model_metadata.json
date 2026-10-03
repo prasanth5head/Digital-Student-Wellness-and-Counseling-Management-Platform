@@ -1,9 +1,10 @@
 {
   "modelName": "AuraWell-RiskClassifier",
   "version": "1.0",
-  "algorithm": "Decision Tree",
-  "dataset": "Kaggle Student Mental Health & Academic Stress Dataset",
-  "trainedAt": "2026-08-19T12:13:15.758649",
+  "algorithm": "Random Forest (Tuned)",
+  "pipelineType": "StandardScaler + RandomForestClassifier",
+  "trainedAt": "2026-10-03T10:03:29.814143",
+  "dataset": "AuraWell Student Mental Health & Academic Stress Dataset",
   "features": [
     "Academic_Pressure",
     "Study_Workload",
@@ -16,67 +17,104 @@
     "Previous_Counseling",
     "Wellness_Score"
   ],
+  "classes": [
+    "CRITICAL",
+    "HIGH",
+    "LOW",
+    "MODERATE"
+  ],
   "metrics": {
-    "accuracy": 0.97,
-    "precision": 0.9702,
-    "recall": 0.97,
-    "f1_score": 0.97,
-    "high_risk_recall": 0.9893
+    "test_accuracy": 0.97,
+    "test_macro_f1": 0.9833,
+    "test_weighted_f1": 0.97,
+    "test_macro_precision": 0.9832,
+    "test_macro_recall": 0.9835,
+    "cv_best_score": 0.988,
+    "class_metrics": {
+      "CRITICAL": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 15.0
+      },
+      "HIGH": {
+        "precision": 0.9781,
+        "recall": 0.9571,
+        "f1-score": 0.9675,
+        "support": 140.0
+      },
+      "LOW": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 15.0
+      },
+      "MODERATE": {
+        "precision": 0.9549,
+        "recall": 0.9769,
+        "f1-score": 0.9658,
+        "support": 130.0
+      }
+    }
   },
   "allModelComparisons": {
     "Logistic Regression": {
-      "accuracy": 0.9067,
-      "precision": 0.9162,
-      "recall": 0.9067,
-      "f1_score": 0.9083,
-      "high_risk_recall": 0.9679
+      "cv_accuracy_mean": 0.9383,
+      "cv_accuracy_std": 0.0116,
+      "cv_macro_f1_mean": 0.897,
+      "cv_macro_f1_std": 0.019,
+      "cv_macro_recall_mean": 0.9581,
+      "cv_macro_precision_mean": 0.8548
     },
     "Decision Tree": {
-      "accuracy": 0.97,
-      "precision": 0.9702,
-      "recall": 0.97,
-      "f1_score": 0.97,
-      "high_risk_recall": 0.9893
+      "cv_accuracy_mean": 0.9783,
+      "cv_accuracy_std": 0.0072,
+      "cv_macro_f1_mean": 0.988,
+      "cv_macro_f1_std": 0.004,
+      "cv_macro_recall_mean": 0.988,
+      "cv_macro_precision_mean": 0.988
     },
     "Random Forest": {
-      "accuracy": 0.96,
-      "precision": 0.9632,
-      "recall": 0.96,
-      "f1_score": 0.9599,
-      "high_risk_recall": 1.0
+      "cv_accuracy_mean": 0.9733,
+      "cv_accuracy_std": 0.0042,
+      "cv_macro_f1_mean": 0.9852,
+      "cv_macro_f1_std": 0.0024,
+      "cv_macro_recall_mean": 0.9851,
+      "cv_macro_precision_mean": 0.9857
     },
     "Gradient Boosting": {
-      "accuracy": 0.9633,
-      "precision": 0.9644,
-      "recall": 0.9633,
-      "f1_score": 0.9633,
-      "high_risk_recall": 0.9929
+      "cv_accuracy_mean": 0.9742,
+      "cv_accuracy_std": 0.0089,
+      "cv_macro_f1_mean": 0.9857,
+      "cv_macro_f1_std": 0.0049,
+      "cv_macro_recall_mean": 0.9857,
+      "cv_macro_precision_mean": 0.9857
     },
     "Support Vector Classifier (SVC)": {
-      "accuracy": 0.8967,
-      "precision": 0.8998,
-      "recall": 0.8967,
-      "f1_score": 0.8974,
-      "high_risk_recall": 0.9274
+      "cv_accuracy_mean": 0.9225,
+      "cv_accuracy_std": 0.012,
+      "cv_macro_f1_mean": 0.8888,
+      "cv_macro_f1_std": 0.018,
+      "cv_macro_recall_mean": 0.9196,
+      "cv_macro_precision_mean": 0.8664
     }
   },
   "featureImportances": {
-    "Wellness_Score": 0.6235,
-    "Stress_Level": 0.0978,
-    "Anxiety_Score": 0.0949,
-    "Sleep_Quality_Hours": 0.0538,
-    "Academic_Pressure": 0.0369,
-    "Depression_Indicator": 0.0336,
-    "Social_Connectedness": 0.02,
-    "Physical_Activity_Hrs": 0.0171,
-    "Study_Workload": 0.0134,
-    "Previous_Counseling": 0.009
+    "Wellness_Score": 0.6089,
+    "Stress_Level": 0.1298,
+    "Anxiety_Score": 0.1022,
+    "Sleep_Quality_Hours": 0.054,
+    "Depression_Indicator": 0.0372,
+    "Academic_Pressure": 0.0318,
+    "Social_Connectedness": 0.0185,
+    "Previous_Counseling": 0.0086,
+    "Study_Workload": 0.0066,
+    "Physical_Activity_Hrs": 0.0024
   },
-  "classes": [
-    "LOW",
-    "MODERATE",
-    "HIGH",
-    "CRITICAL"
-  ],
+  "bestHyperparameters": {
+    "classifier__max_depth": 4,
+    "classifier__min_samples_split": 2,
+    "classifier__n_estimators": 50
+  },
   "status": "ACTIVE"
 }

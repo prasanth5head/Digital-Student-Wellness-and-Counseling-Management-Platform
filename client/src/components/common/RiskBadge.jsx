@@ -38,9 +38,23 @@ export const RiskBadge = ({ riskLevel = 'LOW', size = 'small', showIcon = true }
       border: 'rgba(239, 68, 68, 0.4)',
       icon: DangerousIcon,
     },
+    UNAVAILABLE: {
+      label: 'Screening Unavailable',
+      color: '#64748B',
+      bg: 'rgba(100, 116, 139, 0.12)',
+      border: 'rgba(100, 116, 139, 0.3)',
+      icon: WarningAmberIcon,
+    },
+    PENDING: {
+      label: 'Screening Pending',
+      color: '#64748B',
+      bg: 'rgba(100, 116, 139, 0.12)',
+      border: 'rgba(100, 116, 139, 0.3)',
+      icon: WarningAmberIcon,
+    },
   };
 
-  const cfg = configs[level] || configs.LOW;
+  const cfg = configs[level] || configs.UNAVAILABLE;
   const IconComp = cfg.icon;
 
   return (

@@ -12,6 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.wellness.dto.MLHealthResponse;
+import com.wellness.model.MLPrediction;
+import com.wellness.service.MLPredictionService;
+
 import java.util.List;
 
 @RestController
@@ -20,10 +24,25 @@ public class AssessmentController {
 
     private final AssessmentService assessmentService;
     private final StudentService studentService;
+    private final MLPredictionService mlPredictionService;
 
-    public AssessmentController(AssessmentService assessmentService, StudentService studentService) {
+    public AssessmentController(AssessmentService assessmentService, StudentService studentService, MLPredictionService mlPredictionService) {
         this.assessmentService = assessmentService;
         this.studentService = studentService;
+        this.mlPredictionService = mlPredictionService;
+    }
+
+    @GetMapping("/ml/health")
+    public ResponseEntity<ApiResponse<MLHealthResponse>> getMLHealth() {
+        MLHealthResponse health = mlPredictionService.checkHealth();
+        return ResponseEntity.ok(ApiResponse.ok(health));
+    }
+
+    @GetMapping("/{id}/prediction")
+    public ResponseEntity<ApiResponse<MLPrediction>> getPredictionByAssessmentId(@PathVariable String id) {
+        return mlPredictionService.getPredictionByAssessmentId(id)
+                .map(pred -> ResponseEntity.ok(ApiResponse.ok(pred)))
+                .orElse(ResponseEntity.ok(ApiResponse.ok(null)));
     }
 
     @GetMapping("/questions")

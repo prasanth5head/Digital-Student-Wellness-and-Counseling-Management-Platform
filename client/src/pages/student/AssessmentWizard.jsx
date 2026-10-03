@@ -26,6 +26,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { assessmentAPI } from '../../api/axiosConfig';
 import { useAuth } from '../../context/AuthContext';
 import WellnessScoreDial from '../../components/common/WellnessScoreDial';
+import RiskBadge from '../../components/common/RiskBadge';
 import PDFReportModal from '../../components/common/PDFReportModal';
 import SkeletonLoader from '../../components/common/SkeletonLoader';
 
@@ -382,29 +383,126 @@ export const AssessmentWizard = () => {
 
       {/* Results Modal */}
       {assessmentResult && (
-        <Dialog open={resultModalOpen} onClose={() => setResultModalOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1.5 } }}>
+        <Dialog open={resultModalOpen} onClose={() => setResultModalOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 2 } }}>
           <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
-            <Box sx={{ width: 60, height: 60, borderRadius: '50%', bgcolor: 'success.light', color: '#FFFFFF', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', mb: 1.5 }}>
-              <CheckCircleIcon sx={{ fontSize: 36 }} />
+            <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: 'success.light', color: '#FFFFFF', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+              <CheckCircleIcon sx={{ fontSize: 34 }} />
             </Box>
             <Typography variant="h4" sx={{ fontWeight: 800 }}>Assessment Completed!</Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>Your psychological wellbeing indices have been analyzed.</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 1, alignItems: 'center' }}>
+              <Chip
+                icon={<AutoAwesomeIcon sx={{ fontSize: '1rem !important' }} />}
+                label={`AuraWell ML Engine • ${assessmentResult.mlPrediction?.modelVersion || 'v1.0'}`}
+                size="small"
+                color="primary"
+                variant="outlined"
+                sx={{ fontWeight: 700 }}
+              />
+            </Box>
           </DialogTitle>
-          <DialogContent sx={{ textAlign: 'center', py: 2 }}>
-            <WellnessScoreDial score={assessmentResult.overallScore} riskLevel={assessmentResult.riskLevel} size={170} />
-            <Box sx={{ mt: 3, p: 2, bgcolor: 'background.subtle', borderRadius: 3, textAlign: 'left' }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>Personalized Summary</Typography>
+          <DialogContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', gap: 3, mb: 3 }}>
+              <Box sx={{ textAlign: 'center', flexShrink: 0 }}>
+                <WellnessScoreDial score={assessmentResult.overallScore} riskLevel={assessmentResult.riskLevel} size={160} />
+              </Box>
+
+              <Box sx={{ flexGrow: 1, width: '100%' }}>
+                {assessmentResult.mlPrediction && assessmentResult.mlPrediction.status === 'SUCCESS' ? (
+                  <Card sx={{ p: 2.5, borderRadius: 3, bgcolor: 'background.subtle', border: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                        Predicted Wellness Risk Level
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <RiskBadge riskLevel={assessmentResult.mlPrediction.prediction || assessmentResult.riskLevel} size="medium" />
+                        {assessmentResult.mlPrediction.probability && (
+                          <Chip
+                            label={`${Math.round(assessmentResult.mlPrediction.probability * 100)}% Confidence`}
+                            size="small"
+                            sx={{ fontWeight: 700, bgcolor: 'background.paper' }}
+                          />
+                        )}
+                      </Box>
+                    </Box>
+
+                    {/* Class Probability Breakdown */}
+                    {assessmentResult.mlPrediction.classProbabilities && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.8 }}>
+                          ML Probability Distribution
+                        </Typography>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1.5 }}>
+                          {['LOW', 'MODERATE', 'HIGH', 'CRITICAL'].map((cat) => {
+                            const prob = assessmentResult.mlPrediction.classProbabilities[cat] || 0;
+                            const isPredicted = (assessmentResult.mlPrediction.prediction || '').toUpperCase() === cat;
+                            return (
+                              <Box key={cat} sx={{ p: 1, borderRadius: 2, bgcolor: isPredicted ? 'action.selected' : 'background.paper', border: '1px solid', borderColor: isPredicted ? 'primary.main' : 'divider', textAlign: 'center' }}>
+                                <Typography variant="caption" sx={{ fontWeight: isPredicted ? 800 : 600, display: 'block' }}>{cat}</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 800, color: isPredicted ? 'primary.main' : 'text.primary' }}>{Math.round(prob * 100)}%</Typography>
+                                <LinearProgress variant="determinate" value={prob * 100} sx={{ height: 4, borderRadius: 2, mt: 0.5 }} color={cat === 'CRITICAL' ? 'error' : cat === 'HIGH' ? 'warning' : 'primary'} />
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    )}
+                  </Card>
+                ) : (
+                  <Alert severity="warning" icon={<WarningAmberIcon />} sx={{ borderRadius: 3 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>ML Screening Engine Offline</Typography>
+                    <Typography variant="body2">
+                      Your assessment answers were securely recorded. The ML risk classifier is temporarily unavailable; no automated risk category was assigned.
+                    </Typography>
+                  </Alert>
+                )}
+              </Box>
+            </Box>
+
+            {/* Top Contributing Factors */}
+            {assessmentResult.mlPrediction?.contributingFactors?.length > 0 && (
+              <Box sx={{ mb: 2.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  Key Contributing Wellness Dimensions (ML Feature Attribution)
+                </Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+                  {assessmentResult.mlPrediction.contributingFactors.slice(0, 4).map((factor, idx) => (
+                    <Box key={idx} sx={{ p: 1.5, borderRadius: 2.5, bgcolor: 'background.subtle', border: '1px solid', borderColor: factor.isElevatedRisk ? 'warning.light' : 'divider' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{factor.label}</Typography>
+                        <Chip
+                          label={factor.isElevatedRisk ? 'Elevated Strain' : 'Stable'}
+                          size="small"
+                          color={factor.isElevatedRisk ? 'warning' : 'default'}
+                          sx={{ height: 20, fontSize: '0.7rem', fontWeight: 700 }}
+                        />
+                      </Box>
+                      <LinearProgress variant="determinate" value={Math.min(100, factor.impactScore * 2.5)} sx={{ height: 5, borderRadius: 2 }} color={factor.isElevatedRisk ? 'warning' : 'primary'} />
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            {/* Personalized Summary */}
+            <Box sx={{ p: 2, bgcolor: 'background.subtle', borderRadius: 3, textAlign: 'left', mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>Clinical Evaluation Summary</Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>{assessmentResult.summary}</Typography>
             </Box>
+
+            {/* Mandatory Safety / Non-Medical Disclaimer */}
+            <Alert severity="info" sx={{ borderRadius: 2.5, fontSize: '0.82rem' }}>
+              <strong>Wellness Screening Notice:</strong> This evaluation is generated exclusively by the AuraWell ML screening model for academic wellness support. It does not constitute a clinical or psychiatric medical diagnosis. If you are experiencing distress, consider scheduling a session with a campus counselor.
+            </Alert>
           </DialogContent>
-          <DialogActions sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+
+          <DialogActions sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
             <Button fullWidth variant="contained" color="primary" startIcon={<PictureAsPdfIcon />}
               onClick={() => { setResultModalOpen(false); setPdfModalOpen(true); }}
-              sx={{ borderRadius: 2.5, py: 1.2 }}
+              sx={{ borderRadius: 2.5, py: 1.2, fontWeight: 700 }}
             >
               Download PDF Report
             </Button>
-            <Button fullWidth variant="outlined" onClick={() => navigate('/student/dashboard')} sx={{ borderRadius: 2.5 }}>
+            <Button fullWidth variant="outlined" onClick={() => navigate('/student/dashboard')} sx={{ borderRadius: 2.5, py: 1.2 }}>
               Return to Dashboard
             </Button>
           </DialogActions>

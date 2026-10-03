@@ -232,14 +232,24 @@ Student Wellness and Counseling/
 │   └── target/                          # Compiled JAR & build artifacts
 │       └── wellness-platform-backend-1.0.0.jar.original
 │
-├── ml_service/                          # ML Model Service (Python)
-│   ├── dataset/
-│   │   └── student_mental_health_dataset.csv
-│   │
-│   └── models/
-│       ├── model_metadata.json
-│       ├── wellness_risk_model.joblib   # Pre-trained ML model
-│       └── wellness_scaler.joblib       # Feature scaling
+├── ml_service/                          # Production ML Prediction Service (FastAPI)
+│   ├── models/
+│   │   ├── model_metadata.json          # Model metadata, version, & metrics
+│   │   └── wellness_risk_pipeline.joblib# Unified trained ML pipeline (Scaler + Tuned Random Forest)
+│   ├── src/
+│   │   ├── predict.py                   # Real-time inference engine
+│   │   └── explain.py                   # Feature attribution & explainability
+│   ├── main.py                          # FastAPI endpoints (GET /health, POST /predict)
+│   ├── requirements.txt                 # Production dependencies
+│   ├── Dockerfile                       # Container deployment specification
+│   └── tests/
+│       └── test_ml.py                   # Automated ML unit tests
+│
+├── ml_training/                         # Offline Training & Validation Pipeline (Isolated)
+│   ├── data/
+│   │   └── student_mental_health_dataset.csv # Training benchmark data ONLY
+│   ├── train.py                         # 5-Fold Stratified CV, GridSearch tuning & export
+│   └── evaluate.py                      # Comprehensive model benchmark evaluation
 │
 ├── tools/
 │   └── apache-maven-3.9.6/              # Maven build tool
@@ -504,16 +514,15 @@ Frontend: SocketContext.jsx
 
 ## 🤖 ML Service Integration
 
-**Location:** `ml_service/`
+**Location:** `ml_service/` (Production Microservice) & `ml_training/` (Offline Training)
 
 **Models:**
-- `wellness_risk_model.joblib` - ML model for risk prediction
-- `wellness_scaler.joblib` - Feature scaling
+- `wellness_risk_pipeline.joblib` - Unified Scikit-learn Pipeline (StandardScaler + Tuned RandomForestClassifier)
+- `model_metadata.json` - Model version, evaluation metrics, and feature attribution benchmarks
 
-**Dataset:**
-- `student_mental_health_dataset.csv` - Training data
-
-**Current Integration:** Likely used in backend for assessment scoring and risk level determination
+**Architecture Flow:**
+- React Client → Spring Boot (`AssessmentService`) → FastAPI (`POST /predict`) → Saved Pipeline (`.joblib`) → MongoDB (`ml_predictions`) → React UI
+- **Zero Raw Data in Production:** Production predictions do NOT read CSV files or execute heuristic/rule-based fallbacks.
 
 ---
 

@@ -54,7 +54,10 @@ export const PDFReportModal = ({
     doc.text(`Department: ${student?.departmentName || assessment.departmentName || 'Computer Science'}`, 14, 69);
     doc.text(`Assessment Date: ${new Date(assessment.createdAt).toLocaleDateString()}`, 120, 55);
     doc.text(`Overall Score: ${assessment.overallScore}/100`, 120, 62);
-    doc.text(`Risk Classification: ${assessment.riskLevel || 'LOW'}`, 120, 69);
+    const riskText = assessment.riskLevel || (assessment.mlPrediction?.prediction) || 'NOT EVALUATED';
+    const confText = assessment.mlPrediction?.probability ? ` (${Math.round(assessment.mlPrediction.probability * 100)}% conf)` : '';
+    doc.text(`ML Screening Risk: ${riskText}${confText}`, 120, 69);
+    doc.text(`ML Model Engine: ${assessment.mlPrediction?.modelVersion || 'AuraWell v1.0'}`, 120, 76);
 
     // 3. Category Breakdown Table
     doc.setFont('helvetica', 'bold');
@@ -150,8 +153,13 @@ export const PDFReportModal = ({
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
               {assessment.summary}
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              <RiskBadge riskLevel={assessment.riskLevel} />
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+              <RiskBadge riskLevel={assessment.riskLevel || assessment.mlPrediction?.prediction} />
+              {assessment.mlPrediction?.probability && (
+                <Typography variant="caption" sx={{ fontWeight: 700, bgcolor: 'background.subtle', px: 1, py: 0.5, borderRadius: 1.5 }}>
+                  {Math.round(assessment.mlPrediction.probability * 100)}% ML Confidence ({assessment.mlPrediction.modelVersion || 'v1.0'})
+                </Typography>
+              )}
               <Typography variant="caption" sx={{ color: 'text.secondary', alignSelf: 'center' }}>
                 Completed on {new Date(assessment.createdAt).toLocaleDateString()}
               </Typography>
