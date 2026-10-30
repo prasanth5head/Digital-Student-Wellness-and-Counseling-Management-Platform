@@ -16,13 +16,16 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CampaignIcon from '@mui/icons-material/Campaign';
 
-import { adminAPI } from '../../api/axiosConfig';
+import { adminAPI, departmentAPI } from '../../api/axiosConfig';
 import EmptyState from '../../components/common/EmptyState';
 import SkeletonLoader from '../../components/common/SkeletonLoader';
+import Alert from '@mui/material/Alert';
 
 export const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statusMessage, setStatusMessage] = useState(null);
 
   // Create Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,6 +34,7 @@ export const Announcements = () => {
     content: '',
     priority: 'HIGH',
     targetAudience: 'ALL',
+    targetFaculty: '',
     active: true,
   });
 
@@ -49,6 +53,17 @@ export const Announcements = () => {
 
   useEffect(() => {
     fetchAnnouncements();
+    const fetchDepts = async () => {
+      try {
+        const res = await departmentAPI.getAll();
+        if (res.success && res.data) {
+          setDepartments(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load departments:', err);
+      }
+    };
+    fetchDepts();
   }, []);
 
   const handleDelete = async (id) => {
@@ -62,19 +77,33 @@ export const Announcements = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (form.targetAudience === 'FACULTY' && !form.targetFaculty) {
+      setStatusMessage({ type: 'error', text: 'Please select a specific faculty/department.' });
+      return;
+    }
     try {
-      await adminAPI.createAnnouncement(form);
+      const payload = {
+        ...form,
+        targetRole: form.targetAudience,
+      };
+      const res = await adminAPI.createAnnouncement(payload);
       setModalOpen(false);
       setForm({
         title: '',
         content: '',
         priority: 'HIGH',
         targetAudience: 'ALL',
+        targetFaculty: '',
         active: true,
+      });
+      setStatusMessage({
+        type: 'success',
+        text: res?.message || 'Announcement broadcast successfully published and delivered!',
       });
       fetchAnnouncements();
     } catch (err) {
       console.error(err);
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to publish broadcast announcement.' });
     }
   };
 
@@ -86,6 +115,12 @@ export const Announcements = () => {
     if (p === 'URGENT') return 'error';
     if (p === 'HIGH') return 'warning';
     return 'primary';
+  };
+
+  const getFacultyName = (facultyIdOrCode) => {
+    if (!facultyIdOrCode) return '';
+    const dept = departments.find(d => d.id === facultyIdOrCode || d.code === facultyIdOrCode || d.name === facultyIdOrCode);
+    return dept ? `${dept.name} (${dept.code})` : facultyIdOrCode;
   };
 
   return (
@@ -110,6 +145,16 @@ export const Announcements = () => {
           New Campus Announcement
         </Button>
       </Box>
+
+      {statusMessage && (
+        <Alert
+          severity={statusMessage.type}
+          onClose={() => setStatusMessage(null)}
+          sx={{ mb: 3, borderRadius: 2.5 }}
+        >
+          {statusMessage.text}
+        </Alert>
+      )}
 
       {/* Announcements List */}
       {announcements.length === 0 ? (
@@ -139,10 +184,32 @@ export const Announcements = () => {
                   {a.content}
                 </Typography>
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: (theme) => `1px solid ${theme.palette.divider}` }}>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: (theme) => `1px solid ${theme.palette.divider}`, flexWrap: 'wrap', gap: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', alignItems: 'center' }}>
                     <Chip label={`Priority: ${a.priority}`} color={getPriorityColor(a.priority)} size="small" sx={{ fontWeight: 700 }} />
-                    <Chip label={`Audience: ${a.targetAudience}`} size="small" variant="outlined" sx={{ fontWeight: 600 }} />
+                    <Chip
+                      label={`Audience: ${
+                        a.targetAudience === 'ALL' || a.targetRole === 'ALL'
+                          ? 'Entire Campus'
+                          : a.targetAudience === 'FACULTY' || a.targetRole === 'FACULTY'
+                          ? `Faculty: ${getFacultyName(a.targetFaculty)}`
+                          : a.targetAudience === 'STUDENTS' || a.targetRole === 'STUDENTS'
+                          ? 'Students'
+                          : a.targetAudience || a.targetRole || 'Campus'
+                      }`}
+                      size="small"
+                      variant="outlined"
+                      sx={{ fontWeight: 600 }}
+                    />
+                    {a.recipientCount !== undefined && a.recipientCount > 0 && (
+                      <Chip
+                        label={`Delivered: ${a.recipientCount}`}
+                        size="small"
+                        color="success"
+                        variant="outlined"
+                        sx={{ fontWeight: 600 }}
+                      />
+                    )}
                   </Box>
                   <Typography variant="caption" sx={{ color: 'text.disabled' }}>
                     {a.createdAt ? new Date(a.createdAt).toLocaleDateString() : 'Active'}
@@ -208,14 +275,35 @@ export const Announcements = () => {
                   select
                   label="Target Audience"
                   value={form.targetAudience}
-                  onChange={(e) => setForm({ ...form, targetAudience: e.target.value })}
+                  onChange={(e) => setForm({ ...form, targetAudience: e.target.value, targetFaculty: e.target.value !== 'FACULTY' ? '' : form.targetFaculty })}
                   margin="dense"
                 >
-                  <MenuItem value="ALL">All Campus Users</MenuItem>
-                  <MenuItem value="STUDENTS">Students Only</MenuItem>
-                  <MenuItem value="COUNSELORS">Counselors Only</MenuItem>
+                  <MenuItem value="ALL">Entire Campus (All Users)</MenuItem>
+                  <MenuItem value="FACULTY">Specific Faculty</MenuItem>
+                  <MenuItem value="STUDENTS">Students</MenuItem>
                 </TextField>
               </Grid>
+
+              {form.targetAudience === 'FACULTY' && (
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    select
+                    label="Select Faculty / Department"
+                    value={form.targetFaculty}
+                    onChange={(e) => setForm({ ...form, targetFaculty: e.target.value })}
+                    margin="dense"
+                    required
+                    helperText="Announcement will only be delivered to students belonging to this faculty"
+                  >
+                    {departments.map((dept) => (
+                      <MenuItem key={dept.id} value={dept.id}>
+                        {dept.name} ({dept.code})
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              )}
             </Grid>
           </Box>
         </DialogContent>

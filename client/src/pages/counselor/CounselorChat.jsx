@@ -56,8 +56,9 @@ export const CounselorChat = () => {
       s.registerNumber?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const conversationId = selectedStudent && user
-    ? [user.id, selectedStudent.userId].sort().join('_')
+  const studentRecipientId = selectedStudent ? (selectedStudent.userId || selectedStudent.id) : null;
+  const conversationId = studentRecipientId && user
+    ? [user.id, studentRecipientId].sort().join('_')
     : null;
 
   return (
@@ -133,7 +134,7 @@ export const CounselorChat = () => {
           {selectedStudent ? (
             <ChatBox
               recipientUser={{
-                id: selectedStudent.userId,
+                id: studentRecipientId,
                 name: selectedStudent.name,
                 avatar: selectedStudent.avatar,
               }}

@@ -48,9 +48,34 @@ public class CounselorService {
         Counselor counselor = counselorRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Counselor not found for user: " + userId));
 
-        List<Student> assignedStudents = studentRepository.findByAssignedCounselorId(counselor.getId());
+        Set<String> seenStudentIds = new HashSet<>();
+        List<Student> assignedStudents = new ArrayList<>();
+        for (Student s : studentRepository.findByAssignedCounselorId(counselor.getId())) {
+            if (seenStudentIds.add(s.getId())) {
+                assignedStudents.add(s);
+            }
+        }
+
+        List<Message> counselorMessages = messageRepository.findBySenderIdOrRecipientId(userId, userId);
+        for (Message m : counselorMessages) {
+            String otherUserId = m.getSenderId().equals(userId) ? m.getRecipientId() : m.getSenderId();
+            studentRepository.findByUserId(otherUserId).ifPresent(s -> {
+                if (seenStudentIds.add(s.getId())) {
+                    assignedStudents.add(s);
+                }
+            });
+        }
+
+        for (Student s : studentRepository.findAll()) {
+            if (s.getAssignedCounselorId() == null || s.getAssignedCounselorId().isBlank()) {
+                if (seenStudentIds.add(s.getId())) {
+                    assignedStudents.add(s);
+                }
+            }
+        }
+
         if (assignedStudents.isEmpty()) {
-            assignedStudents = studentRepository.findAll().stream().limit(10).collect(Collectors.toList());
+            assignedStudents.addAll(studentRepository.findAll().stream().limit(10).collect(Collectors.toList()));
         }
 
         List<Student> highRiskStudents = studentRepository.findAll().stream()

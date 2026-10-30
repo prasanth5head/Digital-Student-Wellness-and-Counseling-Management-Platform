@@ -54,6 +54,7 @@ export const ChatBox = ({
     // Listen for live messages for this conversation
     const unsubscribe = registerMessageListener((newMsg) => {
       if (
+        (conversationId && newMsg.conversationId === conversationId) ||
         (newMsg.senderId === recipientUser.id && newMsg.recipientId === user.id) ||
         (newMsg.senderId === user.id && newMsg.recipientId === recipientUser.id)
       ) {

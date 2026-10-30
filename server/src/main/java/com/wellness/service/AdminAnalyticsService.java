@@ -30,13 +30,16 @@ public class AdminAnalyticsService {
     private final AnnouncementRepository announcementRepository;
     private final AuditLogRepository auditLogRepository;
     private final DepartmentService departmentService;
+    private final NotificationRepository notificationRepository;
+    private final com.wellness.websocket.WebSocketPushService webSocketPushService;
 
     public AdminAnalyticsService(StudentRepository studentRepository, CounselorRepository counselorRepository,
                                  UserRepository userRepository, CounselingSessionRepository sessionRepository,
                                  CounselingRequestRepository requestRepository, AppointmentRepository appointmentRepository,
                                  DepartmentRepository departmentRepository, AssessmentResponseRepository responseRepository,
                                  AnnouncementRepository announcementRepository, AuditLogRepository auditLogRepository,
-                                 DepartmentService departmentService) {
+                                 DepartmentService departmentService, NotificationRepository notificationRepository,
+                                 com.wellness.websocket.WebSocketPushService webSocketPushService) {
         this.studentRepository = studentRepository;
         this.counselorRepository = counselorRepository;
         this.userRepository = userRepository;
@@ -48,6 +51,8 @@ public class AdminAnalyticsService {
         this.announcementRepository = announcementRepository;
         this.auditLogRepository = auditLogRepository;
         this.departmentService = departmentService;
+        this.notificationRepository = notificationRepository;
+        this.webSocketPushService = webSocketPushService;
     }
 
     public AdminAnalyticsOverviewDTO getAnalyticsOverview() {
@@ -138,7 +143,119 @@ public class AdminAnalyticsService {
         if (announcement.getCreatedAt() == null) {
             announcement.setCreatedAt(LocalDateTime.now());
         }
-        return announcementRepository.save(announcement);
+
+        String target = announcement.getTargetAudience() != null ? announcement.getTargetAudience().trim().toUpperCase() : "";
+        if (target.isBlank() && announcement.getTargetRole() != null) {
+            target = announcement.getTargetRole().trim().toUpperCase();
+        }
+        if (target.isBlank()) {
+            target = "ALL";
+        }
+
+        // 1. Identify recipient User entities based on target
+        Set<User> recipients = new LinkedHashSet<>();
+
+        if ("STUDENTS".equals(target) || "ROLE_STUDENT".equals(target)) {
+            // Deliver to all eligible student accounts
+            List<User> students = userRepository.findByRoleAndActiveTrue(Role.ROLE_STUDENT);
+            recipients.addAll(students);
+            log.info("Broadcast targeting STUDENTS: found {} eligible recipients", students.size());
+        } else if ("FACULTY".equals(target) || "DEPARTMENT".equals(target)) {
+            // Deliver to specific faculty/department
+            String targetFaculty = announcement.getTargetFaculty();
+            if (targetFaculty != null && !targetFaculty.isBlank()) {
+                String cleanFaculty = targetFaculty.trim();
+                List<Student> facultyStudents = studentRepository.findByDepartmentId(cleanFaculty);
+                if (facultyStudents.isEmpty()) {
+                    facultyStudents = studentRepository.findByDepartmentName(cleanFaculty);
+                }
+                // Also check if targetFaculty matches a Department code or id
+                if (facultyStudents.isEmpty()) {
+                    Optional<Department> deptOpt = departmentRepository.findById(cleanFaculty);
+                    if (deptOpt.isEmpty()) {
+                        deptOpt = departmentRepository.findAll().stream()
+                                .filter(d -> d.getCode().equalsIgnoreCase(cleanFaculty) || d.getName().equalsIgnoreCase(cleanFaculty))
+                                .findFirst();
+                    }
+                    if (deptOpt.isPresent()) {
+                        Department d = deptOpt.get();
+                        facultyStudents = studentRepository.findByDepartmentId(d.getId());
+                        if (facultyStudents.isEmpty()) {
+                            facultyStudents = studentRepository.findByDepartmentName(d.getName());
+                        }
+                    }
+                }
+                if (facultyStudents.isEmpty()) {
+                    facultyStudents = studentRepository.findAll().stream()
+                            .filter(s -> (s.getDepartmentName() != null && s.getDepartmentName().equalsIgnoreCase(cleanFaculty)) ||
+                                         (s.getDepartmentId() != null && s.getDepartmentId().equalsIgnoreCase(cleanFaculty)))
+                            .collect(Collectors.toList());
+                }
+
+                for (Student s : facultyStudents) {
+                    if (s.getUserId() != null) {
+                        userRepository.findById(s.getUserId()).ifPresent(u -> {
+                            if (u.isActive()) recipients.add(u);
+                        });
+                    }
+                }
+                log.info("Broadcast targeting FACULTY {}: found {} students, {} active users", cleanFaculty, facultyStudents.size(), recipients.size());
+            } else {
+                log.warn("Broadcast specified FACULTY target but targetFaculty was blank. No recipients selected.");
+            }
+        } else {
+            // ENTIRE CAMPUS (ALL / CAMPUS / ALL_USERS)
+            // Retrieve all eligible campus recipients (Students and Counselors) without filtering out students due to missing/mismatched faculty
+            List<User> campusUsers = userRepository.findByActiveTrue().stream()
+                    .filter(u -> u.getRole() == Role.ROLE_STUDENT || u.getRole() == Role.ROLE_COUNSELOR)
+                    .collect(Collectors.toList());
+            recipients.addAll(campusUsers);
+            log.info("Broadcast targeting ENTIRE CAMPUS: found {} eligible recipients", campusUsers.size());
+        }
+
+        // 2. Deliver and persist notifications for each recipient (preventing duplicates)
+        List<Notification> deliveredNotifications = new ArrayList<>();
+        for (User recipient : recipients) {
+            boolean alreadyNotified = notificationRepository.existsByRecipientIdAndTitleAndType(
+                    recipient.getId(),
+                    announcement.getTitle(),
+                    NotificationType.ADMIN_ANNOUNCEMENT
+            );
+
+            if (!alreadyNotified) {
+                String link = recipient.getRole() == Role.ROLE_STUDENT ? "/student/dashboard" : "/counselor/dashboard";
+                Notification notif = Notification.builder()
+                        .recipientId(recipient.getId())
+                        .title(announcement.getTitle())
+                        .message(announcement.getContent())
+                        .type(NotificationType.ADMIN_ANNOUNCEMENT)
+                        .link(link)
+                        .isRead(false)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+                deliveredNotifications.add(notif);
+            }
+        }
+
+        if (!deliveredNotifications.isEmpty()) {
+            notificationRepository.saveAll(deliveredNotifications);
+            // Push real-time notification to each recipient via STOMP
+            for (Notification n : deliveredNotifications) {
+                webSocketPushService.pushNotification(n);
+            }
+        }
+
+        // Push announcement to general channel
+        webSocketPushService.pushAnnouncement(announcement);
+
+        announcement.setRecipientCount(deliveredNotifications.size());
+        Announcement saved = announcementRepository.save(announcement);
+
+        log.info("Broadcast '{}' published and delivered to {} recipients (Target: {}, Faculty: {})",
+                saved.getTitle(), deliveredNotifications.size(), target, announcement.getTargetFaculty());
+
+        return saved;
     }
 
     public List<Announcement> getActiveAnnouncements() {

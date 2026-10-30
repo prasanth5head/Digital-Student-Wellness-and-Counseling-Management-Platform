@@ -57,8 +57,9 @@ export const StudentChat = () => {
     );
   }
 
-  const conversationId = selectedCounselor && user
-    ? [user.id, selectedCounselor.userId].sort().join('_')
+  const counselorRecipientId = selectedCounselor ? (selectedCounselor.userId || selectedCounselor.id) : null;
+  const conversationId = counselorRecipientId && user
+    ? [user.id, counselorRecipientId].sort().join('_')
     : null;
 
   return (
@@ -122,7 +123,7 @@ export const StudentChat = () => {
           {selectedCounselor && (
             <ChatBox
               recipientUser={{
-                id: selectedCounselor.userId,
+                id: counselorRecipientId,
                 name: selectedCounselor.name,
                 avatar: selectedCounselor.avatar,
               }}

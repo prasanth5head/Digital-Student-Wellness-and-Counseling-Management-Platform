@@ -95,7 +95,8 @@ public class AdminController {
     @PostMapping("/announcements")
     public ResponseEntity<ApiResponse<Announcement>> createAnnouncement(@RequestBody Announcement announcement) {
         Announcement saved = adminAnalyticsService.createAnnouncement(announcement);
-        return ResponseEntity.ok(ApiResponse.ok("Announcement published", saved));
+        String message = "Announcement published and successfully delivered to " + saved.getRecipientCount() + " recipient(s)";
+        return ResponseEntity.ok(ApiResponse.ok(message, saved));
     }
 
     @DeleteMapping("/announcements/{id}")
